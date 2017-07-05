@@ -11,7 +11,7 @@ endif
 let g:loaded_shimapan = 1
 
 if !exists("g:shimapan_first_color")
-  let g:shimapan_first_color  = "ctermfg=253 ctermbg=63"
+  let g:shimapan_first_color  = "ctermfg=255 ctermbg=26"
 endif
 
 if !exists("g:shimapan_second_color")
