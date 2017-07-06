@@ -53,6 +53,7 @@ endfunction
 
 function s:ShimapanGo()
   if s:shimapan_fname == '' | return | endif
+  if s:shimapan_bufft_dict[s:shimapan_bufnr] == 'shimapan' | return | endif
   let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
   setlocal filetype=shimapan
 endfunction
