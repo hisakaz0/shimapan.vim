@@ -22,6 +22,14 @@ if !exists("g:shimapan_second_color")
   let g:shimapan_second_color = "cterm=reverse"
 endif
 
+if !exists("g:shimapan_first_texticon")
+  let g:shimapan_first_texticon = ">"
+endif
+
+if !exists("g:shimapan_second_texticon")
+  let g:shimapan_second_texticon = "<"
+endif
+
 execute "highlight ShimapanFirstColor  " . g:shimapan_first_color
 execute "highlight ShimapanSecondColor " . g:shimapan_second_color
 
@@ -115,8 +123,8 @@ endfunction
 autocmd Filetype shimapan call <SID>ShimapanUpdate()
 autocmd TextChanged *     call <SID>ShimapanUpdate()
 autocmd TextChangedI *    call <SID>ShimapanUpdate()
-autocmd BufEnter *        call <SID>ShimapanSet()
-autocmd BufReadPost *     call <SID>ShimapanAlready()
+autocmd BufReadPost *     call <SID>ShimapanSet()
+autocmd BufEnter *        call <SID>ShimapanAlready()
 
 
 " ============================================================================
