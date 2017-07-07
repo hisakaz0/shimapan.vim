@@ -30,11 +30,6 @@ if !exists("g:shimapan_second_texticon")
   let g:shimapan_second_texticon = "<"
 endif
 
-execute "highlight ShimapanFirstColor  " . g:shimapan_first_color
-execute "highlight ShimapanSecondColor " . g:shimapan_second_color
-
-sign define ShimapanFirstSign  linehl=ShimapanFirstColor  text=>
-sign define ShimapanSecondSign linehl=ShimapanSecondColor text=<
 
 " NOTE: shi-ma-pan-tsu
 let s:shimapan_sign_id = 4082
@@ -57,6 +52,15 @@ let s:shimapan_bufnr = 0
 
 " ============================================================================
 " function
+
+function! s:ShimapanUpdateAppearance()
+  execute printf("highlight ShimapanFirstColor %s", g:shimapan_first_color)
+  execute printf("highlight ShimapanSecondColor %s", g:shimapan_second_color)
+  execute printf("sign define ShimapanFirstSign linehl=ShimapanFirstColor text=%s",
+        \ g:shimapan_first_texticon)
+  execute printf("sign define ShimapanSecondSign linehl=ShimapanSecondColor text=%s",
+        \ g:shimapan_second_texticon)
+endfunction
 
 function! s:ShimapanSet()
   let s:shimapan_fname = expand('%:p')
@@ -129,9 +133,11 @@ autocmd BufEnter *        call <SID>ShimapanAlready()
 
 " ============================================================================
 " command
-command! ShimapanGo  call <SID>ShimapanGo()
-command! ShimapanBye call <SID>ShimapanBye()
+command! ShimapanGo     call <SID>ShimapanGo()
+command! ShimapanBye    call <SID>ShimapanBye()
+command! ShimapanUpdate call <SID>ShimapanUpdateAppearance()
 
+ShimapanUpdate
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
