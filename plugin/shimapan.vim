@@ -128,6 +128,7 @@ autocmd Filetype shimapan call <SID>ShimapanUpdate()
 autocmd TextChanged *     call <SID>ShimapanUpdate()
 autocmd TextChangedI *    call <SID>ShimapanUpdate()
 autocmd BufReadPost *     call <SID>ShimapanSet()
+autocmd WinEnter *        call <SID>ShimapanSet()
 autocmd BufEnter *        call <SID>ShimapanAlready()
 
 

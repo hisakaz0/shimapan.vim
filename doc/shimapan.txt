@@ -61,16 +61,24 @@ If you use a plugin manager, you can install from it also. In example,
 ==============================================================================
 COMMANDS                                                *shimapan-commands*
 
-:ShimapanGo
+:ShimapanGo                                             *:ShimapanGo*
         When you execute this commands, 'filetype' is changed 'shiampan', and
         each lines are colored alternatively according to the two variables
-        `g:shimapan_first_color` and `g:shimapan_second` color. Previous
+        `g:shimapan_first_color` and `g:shimapan_second_color`. Previous
         filetype is stored. when you type `:ShimapanBye`, filetype shimapan is
         discard and that filetype is set.
 
-:ShimapanBye
+:ShimapanBye                                            *:ShimapanBye*
         When you execute the commands, alternatively coloring is finshed, and
         original syntax highlighting are restored.
+
+
+:ShimapanUpdate                                         *:ShimapanUpdate*
+        When you execute this command, two sign highlight settings will be
+        updated according the following four variables,
+        `g:shimapan_first_color`, `g:shimapan_second_color`,
+        `g:shimapan_first_texticon`, `g:shimapan_second_texticon`. Default of
+        above variables are described in section |shimapan-variables|.
 
 
 ==============================================================================
@@ -94,6 +102,18 @@ g:shimapan_second_color
         to reverse.
 
         Default: "cterm=reverse"
+
+                                                   *g:shimapan_first_texticon*
+g:shimapan_first_texticon
+        A first texticon.
+
+        Default: ">"
+
+                                                  *g:shimapan_second_texticon*
+g:shimapan_second_texticon
+        A second texticon.
+
+        Default: "<"
 
 
 FUNCTIONS                                               *shimapan-functions*
