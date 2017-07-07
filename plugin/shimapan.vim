@@ -55,6 +55,9 @@ function! s:ShimapanSet()
   let s:shimapan_bufnr = bufnr('%')
 endfunction
 
+
+" This function is invoked at BufReadPost event to prevent that vim tries to
+" change from 'shimapan' to original filetype of buffer.
 function s:ShimapanAlready()
   if has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
     setlocal filetype=shimapan
