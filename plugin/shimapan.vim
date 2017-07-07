@@ -10,6 +10,10 @@ if exists("g:loaded_shimapan")
 endif
 let g:loaded_shimapan = 1
 
+if (&t_Co < 256)
+  finish
+endif
+
 if !exists("g:shimapan_first_color")
   let g:shimapan_first_color  = "ctermfg=255 ctermbg=26"
 endif
@@ -24,7 +28,7 @@ execute "highlight ShimapanSecondColor " . g:shimapan_second_color
 sign define ShimapanFirstSign  linehl=ShimapanFirstColor  text=>
 sign define ShimapanSecondSign linehl=ShimapanSecondColor text=<
 
-" shi-ma-pan-tsu
+" NOTE: shi-ma-pan-tsu
 let s:shimapan_sign_id = 4082
 
 " buflist has key-value pairs list.
@@ -51,9 +55,17 @@ function! s:ShimapanSet()
   let s:shimapan_bufnr = bufnr('%')
 endfunction
 
+function s:ShimapanAlready()
+  if has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
+    setlocal filetype=shimapan
+  endif
+endfunction
+
 function s:ShimapanGo()
   if s:shimapan_fname == '' | return | endif
-  let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
+  if !has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
+    let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
+  endif
   setlocal filetype=shimapan
 endfunction
 
@@ -101,7 +113,7 @@ autocmd Filetype shimapan call <SID>ShimapanUpdate()
 autocmd TextChanged *     call <SID>ShimapanUpdate()
 autocmd TextChangedI *    call <SID>ShimapanUpdate()
 autocmd BufEnter *        call <SID>ShimapanSet()
-" autocmd BufWritePost *    call <SID>ShimapanSet()
+autocmd BufReadPost *     call <SID>ShimapanAlready()
 
 
 " ============================================================================

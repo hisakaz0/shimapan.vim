@@ -5,75 +5,100 @@
                                   shimapan~
 
 
-                                 Version: 1.0
+                                Version: 1.0.1
                              License: MIT License
                   Author: hisakazu <cantabilehisa@gmail.com>
-                           Last change: 2017/07/06
+                           Last change: 2017/07/08
 
 
 
-Contents                                                *shimapan-contents*
 ==============================================================================
+CONTENTS                                                *shimapan-contents*
 
-    1. Introduction                                     |shimapan-introduction|
-    2. Commands                                         |shimapan-commands|
-    3. Mappings                                         |shimapan-mappings|
-    4. Variables                                        |shimapan-variables|
-    5. Functions                                        |shimapan-functions|
+    Introduction                                        |shimapan-introduction|
+        Install                                         |shimapan-install|
+    Commands                                            |shimapan-commands|
+    Mappings                                            |shimapan-mappings|
+    Variables                                           |shimapan-variables|
+    Functions                                           |shimapan-functions|
 
-1. Introduction                                         *shimapan-introduction*
+
 ==============================================================================
-    This plugin 'shimapan' enable alternatively coloring like shima pants.
-    It's helpful to you when you read the text which the width is almost
-    determined like csv file. You type `:ShimapanGo`, the file texts are
-    colored each lines alternatively('filetype' is change to 'shimapan'). When
-    you disable the coloring, you type `:ShimapanBye`.
+INTRODUCTION                                            *shimapan-introduction*
+This plugin 'shimapan' enable alternatively coloring like shima pants.  It's
+helpful to you when you read the text which the width is almost determined
+like csv file. You type `:ShimapanGo`, the file texts are colored each lines
+alternatively('filetype' is change to 'shimapan'). When you disable the
+coloring, you type `:ShimapanBye`.
 
-    The alternatively coloring is implemented by vim command, `:sign`.
+The alternatively coloring is implemented by vim command, `:sign`.
 
 
-2. Commands                                             *shimapan-commands*
+INSTALL                                                 *shimapan-install*
+
+This plugin does not support in less than 256 color. Lets install 256 color
+version of vim. Already you use that vim, write folloing a command in your
+.vimrc to enable this plugin. >
+        set t_Co=256
+<
+
+Manual:
+
+1. Get the plugin package from github,
+    https://github.com/pinkienort/shimapan.vim
+2. Put them in your Vim directory
+3. Execute `:ShimapanGo` command when you want to enable, and else execute
+`:ShimapanBye`
+
+Package manager:
+
+If you use a plugin manager, you can install from it also. In example,
+   dein.vim is installed already, write following a command in your .vimrc. >
+       call dein#add('pinkienort/shimapan.vim')
+<
+
+
 ==============================================================================
-    `:ShimapanGo`
+COMMANDS                                                *shimapan-commands*
+
+:ShimapanGo
         When you execute this commands, 'filetype' is changed 'shiampan', and
         each lines are colored alternatively according to the two variables
         `g:shimapan_first_color` and `g:shimapan_second` color. Previous
         filetype is stored. when you type `:ShimapanBye`, filetype shimapan is
         discard and that filetype is set.
 
-    `:ShimapanBye`
+:ShimapanBye
         When you execute the commands, alternatively coloring is finshed, and
         original syntax highlighting are restored.
 
 
-3. Mappings                                             *shimapan-mappings*
 ==============================================================================
-    shimapan.vim does not have mappings in global and in plugins.
+MAPPINGS                                                *shimapan-mappings*
+shimapan.vim does not have mappings in global and in plugins.
 
 
-4. Variables                                            *shimapan-variables*
 ==============================================================================
-    `g:shimapan_first_color`
+VARIABLES                                               *shimapan-variables*
+
+                                                      *g:shimapan_first_color*
+g:shimapan_first_color
         A first color is for alternatively coloring. In default, ctermfg is
         255 which is meant 'white', ctermbg is 26 which is meant 'blue'.
 
-        Default:
-        >
-        let g:shimapan_first_color = "ctermfg=255 ctermbg=26"
-<
+        Default: "ctermfg=255 ctermbg=26"
 
-    `g:shimapan_second_color`
+                                                     *g:shimapan_second_color*
+g:shimapan_second_color
         A second color is for alternatively coloring. In default, cterm is set
         to reverse.
 
-        Default:
-        >
-        let g:shimapan_second_color = "cterm=reverse"
-<
+        Default: "cterm=reverse"
 
-5. Functions                                            *shimapan-functions*
+
+FUNCTIONS                                               *shimapan-functions*
 ==============================================================================
-    shimapan.vim does not have global functions.
+shimapan.vim does not have global functions.
 
 
 vim:tw=78:sw=4:sts=4:ts=4:ft=help:norl:
