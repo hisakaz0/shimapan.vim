@@ -10,6 +10,10 @@ if exists("g:loaded_shimapan")
 endif
 let g:loaded_shimapan = 1
 
+if (&t_Co < 256)
+  finish
+endif
+
 if !exists("g:shimapan_first_color")
   let g:shimapan_first_color  = "ctermfg=255 ctermbg=26"
 endif
@@ -18,13 +22,16 @@ if !exists("g:shimapan_second_color")
   let g:shimapan_second_color = "cterm=reverse"
 endif
 
-execute "highlight ShimapanFirstColor  " . g:shimapan_first_color
-execute "highlight ShimapanSecondColor " . g:shimapan_second_color
+if !exists("g:shimapan_first_texticon")
+  let g:shimapan_first_texticon = ">"
+endif
 
-sign define ShimapanFirstSign  linehl=ShimapanFirstColor  text=>
-sign define ShimapanSecondSign linehl=ShimapanSecondColor text=<
+if !exists("g:shimapan_second_texticon")
+  let g:shimapan_second_texticon = "<"
+endif
 
-" shi-ma-pan-tsu
+
+" NOTE: shi-ma-pan-tsu
 let s:shimapan_sign_id = 4082
 
 " buflist has key-value pairs list.
@@ -46,15 +53,34 @@ let s:shimapan_bufnr = 0
 " ============================================================================
 " function
 
+function! s:ShimapanUpdateAppearance()
+  execute printf("highlight ShimapanFirstColor %s", g:shimapan_first_color)
+  execute printf("highlight ShimapanSecondColor %s", g:shimapan_second_color)
+  execute printf("sign define ShimapanFirstSign linehl=ShimapanFirstColor text=%s",
+        \ g:shimapan_first_texticon)
+  execute printf("sign define ShimapanSecondSign linehl=ShimapanSecondColor text=%s",
+        \ g:shimapan_second_texticon)
+endfunction
+
 function! s:ShimapanSet()
   let s:shimapan_fname = expand('%:p')
   let s:shimapan_bufnr = bufnr('%')
 endfunction
 
+
+" This function is invoked at BufReadPost event to prevent that vim tries to
+" change from 'shimapan' to original filetype of buffer.
+function s:ShimapanAlready()
+  if has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
+    setlocal filetype=shimapan
+  endif
+endfunction
+
 function s:ShimapanGo()
   if s:shimapan_fname == '' | return | endif
-  if s:shimapan_bufft_dict[s:shimapan_bufnr] == 'shimapan' | return | endif
-  let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
+  if !has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
+    let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
+  endif
   setlocal filetype=shimapan
 endfunction
 
@@ -101,15 +127,18 @@ endfunction
 autocmd Filetype shimapan call <SID>ShimapanUpdate()
 autocmd TextChanged *     call <SID>ShimapanUpdate()
 autocmd TextChangedI *    call <SID>ShimapanUpdate()
-autocmd BufEnter *        call <SID>ShimapanSet()
-" autocmd BufWritePost *    call <SID>ShimapanSet()
+autocmd BufReadPost *     call <SID>ShimapanSet()
+autocmd WinEnter *        call <SID>ShimapanSet()
+autocmd BufEnter *        call <SID>ShimapanAlready()
 
 
 " ============================================================================
 " command
-command! ShimapanGo  call <SID>ShimapanGo()
-command! ShimapanBye call <SID>ShimapanBye()
+command! ShimapanGo     call <SID>ShimapanGo()
+command! ShimapanBye    call <SID>ShimapanBye()
+command! ShimapanUpdate call <SID>ShimapanUpdateAppearance()
 
+ShimapanUpdate
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
