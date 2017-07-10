@@ -54,12 +54,12 @@ let s:shimapan_bufnr = 0
 " function
 
 function! s:ShimapanUpdateAppearance()
-  execute printf("highlight ShimapanFirstColor %s", g:shimapan_first_color)
-  execute printf("highlight ShimapanSecondColor %s", g:shimapan_second_color)
-  execute printf("sign define ShimapanFirstSign linehl=ShimapanFirstColor text=%s",
-        \ g:shimapan_first_texticon)
-  execute printf("sign define ShimapanSecondSign linehl=ShimapanSecondColor text=%s",
-        \ g:shimapan_second_texticon)
+  execute "highlight ShimapanFirstColor ".g:shimapan_first_color
+  execute "highlight ShimapanSecondColor ".g:shimapan_second_color
+  execute "sign define ShimapanFirstSign linehl=ShimapanFirstColor text="
+        \ .g:shimapan_first_texticon
+  execute "sign define ShimapanSecondSign linehl=ShimapanSecondColor text="
+        \ .g:shimapan_second_texticon
 endfunction
 
 " This function is invoked at BufReadPost event to prevent that vim tries to
@@ -82,23 +82,21 @@ endfunction
 
 function! s:ShimapanUpdate()
   if &filetype != 'shimapan' | return | endif
-  " if s:shimapan_fname == '' | return | endif
   if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
     let l:i = s:shimapan_bufline_dict[s:shimapan_bufnr]
   else
     let l:i = 1
   endif
   let l:lim = line('$')
-  " TODO: if-elseの実行回数を減らす書き方に変更
+  " TODO: reduce count of execution if-else statement
   while l:i <= lim
     if l:i%2 == 0
-      let l:name = "ShimapanFirstSign"
+      let l:sign = "ShimapanFirstSign"
     else
-      let l:name = "ShimapanSecondSign"
+      let l:sign = "ShimapanSecondSign"
     endif
-    execute printf(
-          \"sign place %d line=%d name=%s buffer=%d",
-          \ s:shimapan_sign_id, l:i, l:name, s:shimapan_bufnr)
+    execute "sign place ".s:shimapan_sign_id." line=".l:i
+          \ ." name=".l:sign." buffer=".s:shimapan_bufnr
     let i += 1
   endwhile
   let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
@@ -111,8 +109,7 @@ function! s:ShimapanBye()
   let l:i = 1
   let l:lim = line('$')
   while l:i <= l:lim
-    execute printf("sign unplace %d buffer=%d",
-          \ s:shimapan_sign_id, l:bufnr)
+    execute "sign unplace ".s:shimapan_sign_id." buffer=".l:bufnr
     let l:i += 1
   endwhile
   let &filetype = s:shimapan_bufft_dict[l:bufnr]
