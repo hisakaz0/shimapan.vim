@@ -94,10 +94,11 @@ VARIABLES                                               *shimapan-variables*
 
                                                       *g:shimapan_first_color*
 g:shimapan_first_color
-        A first color is for alternatively coloring. In default, ctermfg is
-        255 which is meant white, ctermbg is 26 which is meant blue. But
-        the default setting is so high contrast. I recommend following
-        example.
+        A first color is for alternatively coloring. The notation of setting
+        is equal to `:highlight`(reference: *highlight-term* ) In default,
+        ctermfg is 255 which is meant white, ctermbg is 26 which is meant
+        blue. But the default setting is so high contrast. I recommend
+        following example.
 
         Default: "ctermfg=255 ctermbg=26"
 
@@ -124,6 +125,18 @@ g:shimapan_second_texticon
         A second texticon.
 
         Default: "<"
+
+                                                    *g:shimapan_is_signcolumn*
+g:shimapan_is_signcolumn
+        If this variable is 1, 'signcolumn' option be set yes. And texticon
+        for signs are appeared. Else, `g:shimapan_first_texticon` and second
+        one are ignored, signcolumn is not appeared. This variable only
+        accepts "yes", "no" and "auto".
+
+        Default: "no"
+
+
+        Default: 0
 
 
 FUNCTIONS                                               *shimapan-functions*
