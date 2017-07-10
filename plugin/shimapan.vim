@@ -81,8 +81,10 @@ function s:ShimapanGo()
     else
       let s:shimapan_bufft_dict[l:bufnr] = &filetype
     endif
-    call <SID>ShimapanSetVal()
+    " call <SID>ShimapanSetVal()
     setlocal filetype=shimapan
+    let l:lim = line('$')
+    call <SID>ShimapanPlace(l:lim, l:bufnr)
   endif
 endfunction
 
@@ -91,37 +93,34 @@ function! s:ShimapanSetVal()
   " let s:shimapan_fname = expand('%:p')
 endfunction
 
-function! s:ShimapanUpdate()
-  if &filetype != 'shimapan' | return | endif
-  if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
-    let l:i = s:shimapan_bufline_dict[s:shimapan_bufnr]
-  else
-    let l:i = 1
-  endif
-  let l:lim = line('$')
-  " TODO: reduce count of execution if-else statement
-  while l:i <= lim
-    if l:i%2 == 0
-      let l:sign = "ShimapanFirstSign"
-    else
-      let l:sign = "ShimapanSecondSign"
-    endif
-    execute "sign place ".s:shimapan_sign_id." line=".l:i
-          \ ." name=".l:sign." buffer=".s:shimapan_bufnr
-    let i += 1
-  endwhile
-  let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
-endfunction
+" NOTE: currently this funtion is not used.
+" function! s:ShimapanUpdate()
+"   if &filetype != 'shimapan' | return | endif
+"   if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
+"     let l:i = s:shimapan_bufline_dict[s:shimapan_bufnr]
+"   else
+"     let l:i = 1
+"   endif
+"   let l:lim = line('$')
+"   " TODO: reduce count of execution if-else statement
+"   while l:i <= lim
+"     if l:i%2 == 0
+"       let l:sign = "ShimapanFirstSign"
+"     else
+"       let l:sign = "ShimapanSecondSign"
+"     endif
+"     execute "sign place ".s:shimapan_sign_id." line=".l:i
+"           \ ." name=".l:sign." buffer=".s:shimapan_bufnr
+"     let i += 1
+"   endwhile
+"   let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
+" endfunction
 
 function! s:ShimapanBye()
   if &filetype != 'shimapan' | return | endif
   let l:bufnr = bufnr('%')
-  let l:i = 1
   let l:lim = line('$')
-  while l:i <= l:lim
-    execute "sign unplace ".s:shimapan_sign_id." buffer=".l:bufnr
-    let l:i += 1
-  endwhile
+  call <SID>ShimapanRemove(l:lim, l:bufnr)
   if s:shimapan_bufft_dict[l:bufnr] == 'NONE'
     let &filetype = ''
   else
@@ -131,14 +130,44 @@ function! s:ShimapanBye()
   call remove(s:shimapan_bufline_dict, l:bufnr)
 endfunction
 
+function! s:ShimapanRemove(lim, bufnr)
+  let l:i = i
+  while l:i <= a:lim
+    execute "sign unplace ".s:shimapan_sign_id." buffer=".a:bufnr
+    let l:i += 1
+  endwhile
+endfunction
+
+function! s:ShimapanPlace(lim, bufnr)
+  let l:i = 1
+  while l:i <= a:lim
+    if l:i%2 == 0
+      let l:sign = "ShimapanFirstSign"
+    else
+      let l:sign = "ShimapanSecondSign"
+    endif
+    execute "sign place ".s:shimapan_sign_id." line=".l:i
+          \ ." name=".l:sign." buffer=".a:bufnr
+    let i += 1
+  endwhile
+endfunction
+
+function! s:ShimapanReload()
+  if &filetype != 'shimapan' | return | endif
+  let l:bufnr = bufnr('%')
+  let l:lim = line('$')
+  call <SID>ShimapanUnplace(l:lim, l:bufnr)
+  call <SID>ShimapanPlace(l:lim, l:bufnr)
+endfunction
+
 " ============================================================================
 " autocmd
 
 " To update sign placement
-autocmd WinEnter *        call <SID>ShimapanSetVal()
-autocmd Filetype shimapan call <SID>ShimapanUpdate()
-autocmd TextChanged *     call <SID>ShimapanUpdate()
-autocmd TextChangedI *    call <SID>ShimapanUpdate()
+" autocmd WinEnter *        call <SID>ShimapanSetVal()
+" autocmd Filetype shimapan call <SID>ShimapanUpdate()
+" autocmd TextChanged *     call <SID>ShimapanUpdate()
+" autocmd TextChangedI *    call <SID>ShimapanUpdate()
 
 " To prevent that vim set original filetype when the target buffer is re-edit.
 autocmd BufReadPost *     call <SID>ShimapanAlready()
@@ -148,7 +177,7 @@ autocmd BufReadPost *     call <SID>ShimapanAlready()
 " command
 command! ShimapanGo     call <SID>ShimapanGo()
 command! ShimapanBye    call <SID>ShimapanBye()
-command! ShimapanUpdate call <SID>ShimapanUpdateAppearance()
+command! ShimapanReload call <SID>ShimapanReload()
 
 ShimapanUpdate
 

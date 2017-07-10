@@ -73,10 +73,12 @@ COMMANDS                                                *shimapan-commands*
         current buffer, and original syntax highlighting are restored.
 
 
-:ShimapanUpdate                                         *:ShimapanUpdate*
-        When you execute this command, two sign highlight settings for all of
-        buffer which has filetype 'shimapan' will be updated according the
-        following four variables, `g:shimapan_first_color`,
+:ShimapanReload                                         *:ShimapanReload*
+        When you execute this command, alternatively coloring are updated.
+        shimapan.vim does not update automatically. When user want to update,
+        the user have to execute this command. And two sign highlight settings
+        for all of buffer which has filetype 'shimapan' will be updated
+        according the following four variables, `g:shimapan_first_color`,
         `g:shimapan_second_color`, `g:shimapan_first_texticon`,
         `g:shimapan_second_texticon`. Default of above variables are described
         in section |shimapan-variables|.
