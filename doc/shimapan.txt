@@ -95,9 +95,16 @@ VARIABLES                                               *shimapan-variables*
                                                       *g:shimapan_first_color*
 g:shimapan_first_color
         A first color is for alternatively coloring. In default, ctermfg is
-        255 which is meant 'white', ctermbg is 26 which is meant 'blue'.
+        255 which is meant white, ctermbg is 26 which is meant blue. But
+        the default setting is so high contrast. I recommend following
+        example.
 
         Default: "ctermfg=255 ctermbg=26"
+
+        >
+        let g:shimapan_first_color  = "ctermbg=253 ctermbg=232"
+        let g:shimapan_second_color = "ctermbg=255 ctermbg=234"
+<
 
                                                      *g:shimapan_second_color*
 g:shimapan_second_color
