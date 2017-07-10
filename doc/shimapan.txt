@@ -73,10 +73,12 @@ COMMANDS                                                *shimapan-commands*
         current buffer, and original syntax highlighting are restored.
 
 
-:ShimapanUpdate                                         *:ShimapanUpdate*
-        When you execute this command, two sign highlight settings for all of
-        buffer which has filetype 'shimapan' will be updated according the
-        following four variables, `g:shimapan_first_color`,
+:ShimapanReload                                         *:ShimapanReload*
+        When you execute this command, alternatively coloring are updated.
+        shimapan.vim does not update automatically. When user want to update,
+        the user have to execute this command. And two sign highlight settings
+        for all of buffer which has filetype 'shimapan' will be updated
+        according the following four variables, `g:shimapan_first_color`,
         `g:shimapan_second_color`, `g:shimapan_first_texticon`,
         `g:shimapan_second_texticon`. Default of above variables are described
         in section |shimapan-variables|.
@@ -92,10 +94,18 @@ VARIABLES                                               *shimapan-variables*
 
                                                       *g:shimapan_first_color*
 g:shimapan_first_color
-        A first color is for alternatively coloring. In default, ctermfg is
-        255 which is meant 'white', ctermbg is 26 which is meant 'blue'.
+        A first color is for alternatively coloring. The notation of setting
+        is equal to `:highlight`(reference: *highlight-term* ) In default,
+        ctermfg is 255 which is meant white, ctermbg is 26 which is meant
+        blue. But the default setting is so high contrast. I recommend
+        following example.
 
         Default: "ctermfg=255 ctermbg=26"
+
+        >
+        let g:shimapan_first_color  = "ctermbg=253 ctermbg=232"
+        let g:shimapan_second_color = "ctermbg=255 ctermbg=234"
+<
 
                                                      *g:shimapan_second_color*
 g:shimapan_second_color
@@ -115,6 +125,18 @@ g:shimapan_second_texticon
         A second texticon.
 
         Default: "<"
+
+                                                    *g:shimapan_is_signcolumn*
+g:shimapan_is_signcolumn
+        If this variable is 1, 'signcolumn' option be set yes. And texticon
+        for signs are appeared. Else, `g:shimapan_first_texticon` and second
+        one are ignored, signcolumn is not appeared. This variable only
+        accepts "yes", "no" and "auto".
+
+        Default: "no"
+
+
+        Default: 0
 
 
 FUNCTIONS                                               *shimapan-functions*
