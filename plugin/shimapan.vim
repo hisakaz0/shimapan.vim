@@ -54,89 +54,130 @@ let s:shimapan_bufnr = 0
 " function
 
 function! s:ShimapanUpdateAppearance()
-  execute printf("highlight ShimapanFirstColor %s", g:shimapan_first_color)
-  execute printf("highlight ShimapanSecondColor %s", g:shimapan_second_color)
-  execute printf("sign define ShimapanFirstSign linehl=ShimapanFirstColor text=%s",
-        \ g:shimapan_first_texticon)
-  execute printf("sign define ShimapanSecondSign linehl=ShimapanSecondColor text=%s",
-        \ g:shimapan_second_texticon)
+  execute "highlight ShimapanFirstColor ".g:shimapan_first_color
+  execute "highlight ShimapanSecondColor ".g:shimapan_second_color
+  execute "sign define ShimapanFirstSign linehl=ShimapanFirstColor text="
+        \ .g:shimapan_first_texticon
+  execute "sign define ShimapanSecondSign linehl=ShimapanSecondColor text="
+        \ .g:shimapan_second_texticon
 endfunction
-
-function! s:ShimapanSet()
-  let s:shimapan_fname = expand('%:p')
-  let s:shimapan_bufnr = bufnr('%')
-endfunction
-
 
 " This function is invoked at BufReadPost event to prevent that vim tries to
 " change from 'shimapan' to original filetype of buffer.
 function s:ShimapanAlready()
-  if has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
+  let l:bufnr = bufnr('%')
+  if has_key(s:shimapan_bufft_dict, l:bufnr)
     setlocal filetype=shimapan
   endif
 endfunction
 
 function s:ShimapanGo()
-  if s:shimapan_fname == '' | return | endif
-  if !has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
-    let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
+  let l:fname = expand('%:p')
+  if l:fname == '' | return | endif
+  let l:bufnr = bufnr('%')
+  if !has_key(s:shimapan_bufft_dict, l:bufnr)
+    if &filetype == ''
+      let s:shimapan_bufft_dict[l:bufnr] = 'NONE'
+    else
+      let s:shimapan_bufft_dict[l:bufnr] = &filetype
+    endif
+    " call <SID>ShimapanSetVal()
+    setlocal filetype=shimapan
+    let l:lim = line('$')
+    call <SID>ShimapanPlace(l:lim, l:bufnr)
   endif
-  setlocal filetype=shimapan
 endfunction
 
-function! s:ShimapanUpdate()
-  if &filetype != 'shimapan' | return | endif
-  if s:shimapan_fname == '' | return | endif
-  if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
-    let l:i = s:shimapan_bufline_dict[s:shimapan_bufnr]
-  else
-    let l:i = 1
-  endif
-  let l:lim = line('$')
-  while l:i <= lim
-    if l:i%2 == 0
-      let l:name = "ShimapanFirstSign"
-    else
-      let l:name = "ShimapanSecondSign"
-    endif
-    execute printf(
-          \"sign place %d line=%d name=%s file=%s",
-          \ s:shimapan_sign_id, l:i, l:name, s:shimapan_fname)
-    let i += 1
-  endwhile
-  let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
+function! s:ShimapanSetVal()
+  let s:shimapan_bufnr = bufnr('%')
+  " let s:shimapan_fname = expand('%:p')
 endfunction
+
+" NOTE: currently this funtion is not used.
+" function! s:ShimapanUpdate()
+"   if &filetype != 'shimapan' | return | endif
+"   if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
+"     let l:i = s:shimapan_bufline_dict[s:shimapan_bufnr]
+"   else
+"     let l:i = 1
+"   endif
+"   let l:lim = line('$')
+"   " TODO: reduce count of execution if-else statement
+"   while l:i <= lim
+"     if l:i%2 == 0
+"       let l:sign = "ShimapanFirstSign"
+"     else
+"       let l:sign = "ShimapanSecondSign"
+"     endif
+"     execute "sign place ".s:shimapan_sign_id." line=".l:i
+"           \ ." name=".l:sign." buffer=".s:shimapan_bufnr
+"     let i += 1
+"   endwhile
+"   let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
+" endfunction
 
 function! s:ShimapanBye()
   if &filetype != 'shimapan' | return | endif
-  if s:shimapan_fname == '' | return | endif
-  let l:i = 1
+  let l:bufnr = bufnr('%')
   let l:lim = line('$')
-  while l:i <= l:lim
-    execute printf("sign unplace %d file=%s",
-          \ s:shimapan_sign_id, s:shimapan_fname)
+  call <SID>ShimapanRemove(l:lim, l:bufnr)
+  if s:shimapan_bufft_dict[l:bufnr] == 'NONE'
+    let &filetype = ''
+  else
+    let &filetype = s:shimapan_bufft_dict[l:bufnr]
+  endif
+  call remove(s:shimapan_bufft_dict, l:bufnr)
+  call remove(s:shimapan_bufline_dict, l:bufnr)
+endfunction
+
+function! s:ShimapanRemove(lim, bufnr)
+  let l:i = i
+  while l:i <= a:lim
+    execute "sign unplace ".s:shimapan_sign_id." buffer=".a:bufnr
     let l:i += 1
   endwhile
-  let &filetype= s:shimapan_bufft_dict[s:shimapan_bufnr]
-  call remove(s:shimapan_bufft_dict, s:shimapan_bufnr)
-  call remove(s:shimapan_bufline_dict, s:shimapan_bufnr)
+endfunction
+
+function! s:ShimapanPlace(lim, bufnr)
+  let l:i = 1
+  while l:i <= a:lim
+    if l:i%2 == 0
+      let l:sign = "ShimapanFirstSign"
+    else
+      let l:sign = "ShimapanSecondSign"
+    endif
+    execute "sign place ".s:shimapan_sign_id." line=".l:i
+          \ ." name=".l:sign." buffer=".a:bufnr
+    let i += 1
+  endwhile
+endfunction
+
+function! s:ShimapanReload()
+  if &filetype != 'shimapan' | return | endif
+  let l:bufnr = bufnr('%')
+  let l:lim = line('$')
+  call <SID>ShimapanUnplace(l:lim, l:bufnr)
+  call <SID>ShimapanPlace(l:lim, l:bufnr)
 endfunction
 
 " ============================================================================
 " autocmd
-autocmd Filetype shimapan call <SID>ShimapanUpdate()
-autocmd TextChanged *     call <SID>ShimapanUpdate()
-autocmd TextChangedI *    call <SID>ShimapanUpdate()
-autocmd BufReadPost *     call <SID>ShimapanSet()
-autocmd WinEnter *        call <SID>ShimapanSet()
-autocmd BufEnter *        call <SID>ShimapanAlready()
+
+" To update sign placement
+" autocmd WinEnter *        call <SID>ShimapanSetVal()
+" autocmd Filetype shimapan call <SID>ShimapanUpdate()
+" autocmd TextChanged *     call <SID>ShimapanUpdate()
+" autocmd TextChangedI *    call <SID>ShimapanUpdate()
+
+" To prevent that vim set original filetype when the target buffer is re-edit.
+autocmd BufReadPost *     call <SID>ShimapanAlready()
 
 
 " ============================================================================
 " command
 command! ShimapanGo     call <SID>ShimapanGo()
 command! ShimapanBye    call <SID>ShimapanBye()
-command! ShimapanUpdate call <SID>ShimapanUpdateAppearance()
+command! ShimapanReload call <SID>ShimapanReload()
 
 ShimapanUpdate
 
