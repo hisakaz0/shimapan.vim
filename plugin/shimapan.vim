@@ -62,37 +62,34 @@ function! s:ShimapanUpdateAppearance()
         \ g:shimapan_second_texticon)
 endfunction
 
-function! s:ShimapanSet()
-  let s:shimapan_fname = expand('%:p')
-  let s:shimapan_bufnr = bufnr('%')
-endfunction
-
-
 " This function is invoked at BufReadPost event to prevent that vim tries to
 " change from 'shimapan' to original filetype of buffer.
 function s:ShimapanAlready()
-  if has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
+  let l:bufnr = bufnr('%')
+  if has_key(s:shimapan_bufft_dict, l:bufnr)
     setlocal filetype=shimapan
   endif
 endfunction
 
 function s:ShimapanGo()
-  if s:shimapan_fname == '' | return | endif
-  if !has_key(s:shimapan_bufft_dict, s:shimapan_bufnr)
-    let s:shimapan_bufft_dict[s:shimapan_bufnr] = &filetype
+  " if s:shimapan_fname == '' | return | endif
+  let l:bufnr = bufnr('%')
+  if !has_key(s:shimapan_bufft_dict, l:bufnr)
+    let s:shimapan_bufft_dict[l:bufnr] = &filetype
+    setlocal filetype=shimapan
   endif
-  setlocal filetype=shimapan
 endfunction
 
 function! s:ShimapanUpdate()
   if &filetype != 'shimapan' | return | endif
-  if s:shimapan_fname == '' | return | endif
+  " if s:shimapan_fname == '' | return | endif
   if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
     let l:i = s:shimapan_bufline_dict[s:shimapan_bufnr]
   else
     let l:i = 1
   endif
   let l:lim = line('$')
+  " TODO: if-elseの実行回数を減らす書き方に変更
   while l:i <= lim
     if l:i%2 == 0
       let l:name = "ShimapanFirstSign"
@@ -100,8 +97,8 @@ function! s:ShimapanUpdate()
       let l:name = "ShimapanSecondSign"
     endif
     execute printf(
-          \"sign place %d line=%d name=%s file=%s",
-          \ s:shimapan_sign_id, l:i, l:name, s:shimapan_fname)
+          \"sign place %d line=%d name=%s buffer=%d",
+          \ s:shimapan_sign_id, l:i, l:name, s:shimapan_bufnr)
     let i += 1
   endwhile
   let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
@@ -109,27 +106,30 @@ endfunction
 
 function! s:ShimapanBye()
   if &filetype != 'shimapan' | return | endif
-  if s:shimapan_fname == '' | return | endif
+  " if s:shimapan_fname == '' | return | endif
+  let l:bufnr = bufnr('%')
   let l:i = 1
   let l:lim = line('$')
   while l:i <= l:lim
-    execute printf("sign unplace %d file=%s",
-          \ s:shimapan_sign_id, s:shimapan_fname)
+    execute printf("sign unplace %d buffer=%d",
+          \ s:shimapan_sign_id, l:bufnr)
     let l:i += 1
   endwhile
-  let &filetype= s:shimapan_bufft_dict[s:shimapan_bufnr]
-  call remove(s:shimapan_bufft_dict, s:shimapan_bufnr)
-  call remove(s:shimapan_bufline_dict, s:shimapan_bufnr)
+  let &filetype = s:shimapan_bufft_dict[l:bufnr]
+  call remove(s:shimapan_bufft_dict, l:bufnr)
+  call remove(s:shimapan_bufline_dict, l:bufnr)
 endfunction
 
 " ============================================================================
 " autocmd
+
+" To update sign placement
 autocmd Filetype shimapan call <SID>ShimapanUpdate()
 autocmd TextChanged *     call <SID>ShimapanUpdate()
 autocmd TextChangedI *    call <SID>ShimapanUpdate()
-autocmd BufReadPost *     call <SID>ShimapanSet()
-autocmd WinEnter *        call <SID>ShimapanSet()
-autocmd BufEnter *        call <SID>ShimapanAlready()
+
+" To prevent that vim set original filetype when the target buffer is re-edit.
+autocmd BufReadPost *     call <SID>ShimapanAlready()
 
 
 " ============================================================================
