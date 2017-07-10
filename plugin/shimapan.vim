@@ -91,6 +91,10 @@ function! s:ShimapanSetVal()
   " let s:shimapan_fname = expand('%:p')
 endfunction
 
+" TODO: This function works correctly in the only case, that add the line from
+" lastline of buffer in both insert mode and normal mode. In other case, the
+" function does not work so. For examples, when mode is normal, some lines are
+" put in where is not lastline. Also, some lines are deleted in that place.
 function! s:ShimapanUpdate()
   if &filetype != 'shimapan' | return | endif
   if has_key(s:shimapan_bufline_dict, s:shimapan_bufnr)
@@ -98,19 +102,28 @@ function! s:ShimapanUpdate()
   else
     let l:i = 1
   endif
+  if l:i%2 == 0
+    let l:even = l:i
+    let l:odd  = l:i+1
+  else
+    let l:odd  = l:i
+    let l:even = l:i+1
+  endif
   let l:lim = line('$')
-  " TODO: reduce count of execution if-else statement
-  while l:i <= lim
-    if l:i%2 == 0
-      let l:sign = "ShimapanFirstSign"
-    else
-      let l:sign = "ShimapanSecondSign"
-    endif
+  call <SID>ShimapanUpdateEvenOdd(l:odd, l:lim, "ShimapanFirstSign",
+        \ s:shimapan_bufnr)
+  call <SID>ShimapanUpdateEvenOdd(l:even, l:lim, "ShimapanSecondSign",
+        \ s:shimapan_bufnr)
+  let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:lim + 1
+endfunction
+
+function! s:ShimapanUpdateEvenOdd(start, end, sign, bufnr)
+  let l:i = a:start
+  while l:i <= a:end
     execute "sign place ".s:shimapan_sign_id." line=".l:i
-          \ ." name=".l:sign." buffer=".s:shimapan_bufnr
-    let i += 1
+          \ ." name=".a:sign." buffer=".a:bufnr
+    let l:i += 2
   endwhile
-  let s:shimapan_bufline_dict[s:shimapan_bufnr] = l:i
 endfunction
 
 function! s:ShimapanBye()
