@@ -72,12 +72,23 @@ function s:ShimapanAlready()
 endfunction
 
 function s:ShimapanGo()
-  " if s:shimapan_fname == '' | return | endif
+  let l:fname = expand('%:p')
+  if l:fname == '' | return | endif
   let l:bufnr = bufnr('%')
   if !has_key(s:shimapan_bufft_dict, l:bufnr)
-    let s:shimapan_bufft_dict[l:bufnr] = &filetype
+    if &filetype == ''
+      let s:shimapan_bufft_dict[l:bufnr] = 'NONE'
+    else
+      let s:shimapan_bufft_dict[l:bufnr] = &filetype
+    endif
+    call <SID>ShimapanSetVal()
     setlocal filetype=shimapan
   endif
+endfunction
+
+function! s:ShimapanSetVal()
+  let s:shimapan_bufnr = bufnr('%')
+  " let s:shimapan_fname = expand('%:p')
 endfunction
 
 function! s:ShimapanUpdate()
@@ -104,7 +115,6 @@ endfunction
 
 function! s:ShimapanBye()
   if &filetype != 'shimapan' | return | endif
-  " if s:shimapan_fname == '' | return | endif
   let l:bufnr = bufnr('%')
   let l:i = 1
   let l:lim = line('$')
@@ -112,7 +122,11 @@ function! s:ShimapanBye()
     execute "sign unplace ".s:shimapan_sign_id." buffer=".l:bufnr
     let l:i += 1
   endwhile
-  let &filetype = s:shimapan_bufft_dict[l:bufnr]
+  if s:shimapan_bufft_dict[l:bufnr] == 'NONE'
+    let &filetype = ''
+  else
+    let &filetype = s:shimapan_bufft_dict[l:bufnr]
+  endif
   call remove(s:shimapan_bufft_dict, l:bufnr)
   call remove(s:shimapan_bufline_dict, l:bufnr)
 endfunction
@@ -121,6 +135,7 @@ endfunction
 " autocmd
 
 " To update sign placement
+autocmd WinEnter *        call <SID>ShimapanSetVal()
 autocmd Filetype shimapan call <SID>ShimapanUpdate()
 autocmd TextChanged *     call <SID>ShimapanUpdate()
 autocmd TextChangedI *    call <SID>ShimapanUpdate()
