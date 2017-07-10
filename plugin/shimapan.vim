@@ -30,6 +30,10 @@ if !exists("g:shimapan_second_texticon")
   let g:shimapan_second_texticon = "<"
 endif
 
+if !exists("g:shimapan_is_signcolumn")
+  let g:shimapan_is_signcolumn = 'no'
+endif
+
 
 " NOTE: shi-ma-pan-tsu
 let s:shimapan_sign_id = 4082
@@ -82,16 +86,18 @@ function s:ShimapanGo()
       let s:shimapan_bufft_dict[l:bufnr] = &filetype
     endif
     " call <SID>ShimapanSetVal()
+    execute "setlocal signcolumn=".g:shimapan_is_signcolumn
     setlocal filetype=shimapan
     let l:lim = line('$')
     call <SID>ShimapanPlace(l:lim, l:bufnr)
   endif
 endfunction
 
-function! s:ShimapanSetVal()
-  let s:shimapan_bufnr = bufnr('%')
-  " let s:shimapan_fname = expand('%:p')
-endfunction
+" NOTE: currently this funtion is not used.
+" function! s:ShimapanSetVal()
+"   let s:shimapan_bufnr = bufnr('%')
+"   " let s:shimapan_fname = expand('%:p')
+" endfunction
 
 " NOTE: currently this funtion is not used.
 " function! s:ShimapanUpdate()
@@ -130,8 +136,8 @@ function! s:ShimapanBye()
   call remove(s:shimapan_bufline_dict, l:bufnr)
 endfunction
 
-function! s:ShimapanRemove(lim, bufnr)
-  let l:i = i
+function! s:ShimapanUnplace(lim, bufnr)
+  let l:i = 1
   while l:i <= a:lim
     execute "sign unplace ".s:shimapan_sign_id." buffer=".a:bufnr
     let l:i += 1
@@ -148,7 +154,7 @@ function! s:ShimapanPlace(lim, bufnr)
     endif
     execute "sign place ".s:shimapan_sign_id." line=".l:i
           \ ." name=".l:sign." buffer=".a:bufnr
-    let i += 1
+    let l:i += 1
   endwhile
 endfunction
 
@@ -156,6 +162,7 @@ function! s:ShimapanReload()
   if &filetype != 'shimapan' | return | endif
   let l:bufnr = bufnr('%')
   let l:lim = line('$')
+  call <SID>ShimapanUpdateAppearance()
   call <SID>ShimapanUnplace(l:lim, l:bufnr)
   call <SID>ShimapanPlace(l:lim, l:bufnr)
 endfunction
@@ -179,7 +186,7 @@ command! ShimapanGo     call <SID>ShimapanGo()
 command! ShimapanBye    call <SID>ShimapanBye()
 command! ShimapanReload call <SID>ShimapanReload()
 
-ShimapanUpdate
+call <SID>ShimapanUpdateAppearance()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
